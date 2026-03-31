@@ -17,8 +17,8 @@ from modus.exceptions import (
     ValidationError,
 )
 
-BASE_URL = "https://modusoperator.com"
-API_KEY = "uni_test_xxx"
+BASE_URL = "https://modustrust.ai"
+API_KEY = "mod_test_xxx"
 
 pytestmark = pytest.mark.asyncio
 
@@ -836,7 +836,7 @@ class TestAPIKeys:
         assert result == body
 
     async def test_create_api_key(self, async_client, mock_api):
-        resp = {"id": "key_2", "key": "uni_live_new"}
+        resp = {"id": "key_2", "key": "mod_live_new"}
         route = mock_api.post("/api/users/api-keys").mock(
             return_value=httpx.Response(201, json=resp)
         )

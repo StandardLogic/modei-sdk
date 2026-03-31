@@ -8,7 +8,7 @@
  *
  * Usage:
  *   MODUS_API_KEY=sk_xxx npx modus-mcp
- *   MODUS_API_KEY=uni_xxx npx modus-mcp
+ *   MODUS_API_KEY=mod_xxx npx modus-mcp
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -22,7 +22,7 @@ import { ApiClient } from './api-client.js';
 import { allTools, handleToolCall } from './tools/index.js';
 
 // Configuration from environment
-const MODUS_API_URL = process.env.MODUS_API_URL || 'https://modusoperator.com';
+const MODUS_API_URL = process.env.MODUS_API_URL || 'https://modustrust.ai';
 const MODUS_API_KEY = process.env.MODUS_API_KEY;
 
 async function main() {
@@ -34,7 +34,7 @@ async function main() {
     console.error('  MODUS_API_KEY=sk_xxx npx modus-mcp');
     console.error('');
     console.error('Or for local development:');
-    console.error('  MODUS_API_KEY=uni_xxx npx modus-mcp');
+    console.error('  MODUS_API_KEY=mod_xxx npx modus-mcp');
     process.exit(1);
   }
 

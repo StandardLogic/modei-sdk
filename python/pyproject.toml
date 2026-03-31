@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 authors = [
-    { name = "Standard Logic Co.", email = "support@modusoperator.com" },
+    { name = "Standard Logic Co.", email = "support@modustrust.ai" },
 ]
 keywords = [
     "modus",
@@ -47,8 +47,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://modusoperator.com"
-Documentation = "https://modusoperator.com/guide"
+Homepage = "https://modustrust.ai"
+Documentation = "https://modustrust.ai/guide"
 Repository = "https://github.com/StandardLogic/modus-mcp"
 
 [tool.pytest.ini_options]

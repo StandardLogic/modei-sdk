@@ -17,8 +17,8 @@ from modus.exceptions import (
     ValidationError,
 )
 
-BASE_URL = "https://modusoperator.com"
-API_KEY = "uni_test_xxx"
+BASE_URL = "https://modustrust.ai"
+API_KEY = "mod_test_xxx"
 
 
 # ======================================================================
@@ -868,7 +868,7 @@ class TestAPIKeys:
         assert route.calls[0].request.method == "GET"
 
     def test_create_api_key(self, client, mock_api):
-        resp = {"id": "key_2", "key": "uni_live_new"}
+        resp = {"id": "key_2", "key": "mod_live_new"}
         route = mock_api.post("/api/users/api-keys").mock(
             return_value=httpx.Response(201, json=resp)
         )

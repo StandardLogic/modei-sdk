@@ -16,7 +16,7 @@ from .exceptions import (
     ValidationError,
 )
 
-DEFAULT_BASE_URL = "https://modusoperator.com"
+DEFAULT_BASE_URL = "https://modustrust.ai"
 DEFAULT_TIMEOUT = 30.0
 
 

@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/modus-sdk)](https://pypi.org/project/modus-sdk/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Python SDK for the [Modus](https://modusoperator.com) REST API. Manage agent passports, gates, and enforcement policies programmatically.
+Python SDK for the [Modus](https://modustrust.ai) REST API. Manage agent passports, gates, and enforcement policies programmatically.
 
 The MCP server (for Claude Desktop, Cursor, etc.) is the separate TypeScript package: [modus-mcp on npm](https://www.npmjs.com/package/modus-mcp).
 
@@ -244,7 +244,7 @@ except ModusError as e:
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `MODUS_API_KEY` | Yes | — | Your Modus API key |
-| `MODUS_API_URL` | No | `https://modusoperator.com` | API base URL (override for local dev) |
+| `MODUS_API_URL` | No | `https://modustrust.ai` | API base URL (override for local dev) |
 
 You can also pass these directly to the client:
 
@@ -256,7 +256,7 @@ client = ModusClient(api_key="mod_live_xxx", base_url="http://localhost:3000")
 
 ## Documentation
 
-Full documentation at [modusoperator.com/docs](https://modusoperator.com/docs)
+Full documentation at [modustrust.ai/docs](https://modustrust.ai/docs)
 
 ---
 
