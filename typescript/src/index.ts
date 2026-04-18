@@ -59,7 +59,7 @@ async function main() {
   // Create MCP server
   const server = new Server(
     {
-      name: 'modei-manage',
+      name: 'modei',
       version: '1.0.0',
     },
     {

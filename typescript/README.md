@@ -1,6 +1,6 @@
 # modei-mcp
 
-<!-- mcp-name: io.github.standardlogic/modei-manage -->
+<!-- mcp-name: io.github.standardlogic/modei -->
 
 [![npm version](https://img.shields.io/npm/v/modei-mcp)](https://www.npmjs.com/package/modei-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
