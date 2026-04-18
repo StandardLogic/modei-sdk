@@ -1,18 +1,18 @@
-# modus-mcp
+# modei-mcp
 
-<!-- mcp-name: io.github.standardlogic/modus-manage -->
+<!-- mcp-name: io.github.standardlogic/modei-manage -->
 
-[![npm version](https://img.shields.io/npm/v/modus-mcp)](https://www.npmjs.com/package/modus-mcp)
+[![npm version](https://img.shields.io/npm/v/modei-mcp)](https://www.npmjs.com/package/modei-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![MCP Compatible](https://img.shields.io/badge/MCP-compatible-green)](https://modelcontextprotocol.io)
 
-MCP server for managing [Modus](https://modustrust.ai) agent governance infrastructure — passports, gates, constraints, enforcement, and audit — directly from Claude, Cursor, or any MCP client.
+MCP server for managing [Modei](https://modeioperator.com) agent governance infrastructure — passports, gates, constraints, enforcement, and audit — directly from Claude, Cursor, or any MCP client.
 
 ---
 
-## What is Modus?
+## What is Modei?
 
-[Modus](https://modustrust.ai) is the trust layer for AI agents. It has two sides:
+[Modei](https://modeioperator.com) is the trust layer for AI agents. It has two sides:
 
 **Gates** protect your tools, APIs, and MCP servers. A Gate is a verification checkpoint — you define a permission catalog of what's allowed, and incoming agent requests are checked against it locally, with no network round-trip. Every decision produces a signed attestation for a tamper-evident audit trail.
 
@@ -25,7 +25,7 @@ This MCP server lets you manage both sides conversationally from any MCP client.
 
 ## Prerequisites
 
-- A **Modus account** — sign up at the [Modus Dashboard](https://modustrust.ai)
+- A **Modei account** — sign up at the [Modei Dashboard](https://modeioperator.com)
 - **Claude Desktop**, **Claude Code**, **Cursor**, or any MCP-compatible client
 - An **API key** — generate one from the dashboard
 
@@ -35,7 +35,7 @@ This MCP server lets you manage both sides conversationally from any MCP client.
 
 ### Connect with API Key (Claude Desktop, any MCP client)
 
-Add Modus to your MCP configuration:
+Add Modei to your MCP configuration:
 
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
@@ -43,11 +43,11 @@ Add Modus to your MCP configuration:
 ```json
 {
   "mcpServers": {
-    "modus": {
+    "modei": {
       "command": "npx",
-      "args": ["modus-mcp"],
+      "args": ["modei-mcp"],
       "env": {
-        "MODUS_API_KEY": "mod_live_xxxxxxxx"
+        "MODEI_API_KEY": "mod_live_xxxxxxxx"
       }
     }
   }
@@ -57,10 +57,10 @@ Add Modus to your MCP configuration:
 ### Add to Claude Code
 
 ```bash
-claude mcp add modus \
+claude mcp add modei \
   --scope user \
-  -- npx modus-mcp \
-  --env MODUS_API_KEY=mod_live_xxxxxxxx
+  -- npx modei-mcp \
+  --env MODEI_API_KEY=mod_live_xxxxxxxx
 ```
 
 Restart your client and you're ready to go.
@@ -175,8 +175,8 @@ Restart your client and you're ready to go.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MODUS_API_KEY` | Yes | — | Your Modus API key (`mod_live_*` or `mod_test_*`) |
-| `MODUS_API_URL` | No | `https://modustrust.ai` | API base URL (override for local dev) |
+| `MODEI_API_KEY` | Yes | — | Your Modei API key (`mod_live_*` or `mod_test_*`) |
+| `MODEI_API_URL` | No | `https://modeioperator.com` | API base URL (override for local dev) |
 
 ---
 
@@ -187,12 +187,12 @@ For local testing against a development dashboard:
 ```json
 {
   "mcpServers": {
-    "modus": {
+    "modei": {
       "command": "npx",
-      "args": ["modus-mcp"],
+      "args": ["modei-mcp"],
       "env": {
-        "MODUS_API_URL": "http://localhost:3000",
-        "MODUS_API_KEY": "mod_test_xxxxxxxx"
+        "MODEI_API_URL": "http://localhost:3000",
+        "MODEI_API_KEY": "mod_test_xxxxxxxx"
       }
     }
   }
@@ -210,17 +210,17 @@ Make sure you've restarted Claude Desktop after editing the config file. Check f
 Verify your key starts with `mod_live_` (production) or `mod_test_` (development) and hasn't been revoked.
 
 **Tools aren't showing up**
-Run `npx modus-mcp` directly in your terminal to check for startup errors. Ensure Node.js 18+.
+Run `npx modei-mcp` directly in your terminal to check for startup errors. Ensure Node.js 18+.
 
 ---
 
 ## Learn More
 
-- [Modus Dashboard](https://modustrust.ai) — Create your account and manage gates, passports, and API keys
-- [Documentation & Guides](https://modustrust.ai)
-- [MCP SDK (TypeScript)](https://www.npmjs.com/package/modus-mcp-sdk) · [MCP SDK (Python)](https://pypi.org/project/modus-mcp-sdk/)
-- [Management SDK (Python)](https://pypi.org/project/modus-mcp/)
-- [Discussions](https://github.com/StandardLogic/modus-mcp/discussions) — Questions and ideas
+- [Modei Dashboard](https://modeioperator.com) — Create your account and manage gates, passports, and API keys
+- [Documentation & Guides](https://modeioperator.com)
+- [MCP SDK (TypeScript)](https://www.npmjs.com/package/modei-mcp-sdk) · [MCP SDK (Python)](https://pypi.org/project/modei-mcp-sdk/)
+- [Management SDK (Python)](https://pypi.org/project/modei-mcp/)
+- [Discussions](https://github.com/StandardLogic/modei-mcp/discussions) — Questions and ideas
 
 ---
 

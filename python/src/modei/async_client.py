@@ -1,4 +1,4 @@
-"""Synchronous Modus client using httpx."""
+"""Asynchronous Modei client using httpx."""
 
 from __future__ import annotations
 
@@ -44,12 +44,12 @@ from .types import (
 )
 
 
-class ModusClient:
-    """Synchronous client for the Modus REST API.
+class AsyncModeiClient:
+    """Asynchronous client for the Modei REST API.
 
     Args:
-        api_key: Modus API key (e.g. ``mod_live_xxx``).
-        base_url: API base URL. Defaults to ``https://modustrust.ai``.
+        api_key: Modei API key (e.g. ``mod_live_xxx``).
+        base_url: API base URL. Defaults to ``https://modeioperator.com``.
         timeout: Request timeout in seconds. Defaults to 30.
     """
 
@@ -62,57 +62,57 @@ class ModusClient:
     ) -> None:
         self._api_key = api_key
         self._base_url = base_url.rstrip("/")
-        self._client = httpx.Client(
+        self._client = httpx.AsyncClient(
             base_url=self._base_url,
             headers=_build_headers(api_key),
             timeout=timeout,
         )
 
-    def close(self) -> None:
+    async def close(self) -> None:
         """Close the underlying HTTP client."""
-        self._client.close()
+        await self._client.aclose()
 
-    def __enter__(self) -> ModusClient:
+    async def __aenter__(self) -> AsyncModeiClient:
         return self
 
-    def __exit__(self, *args: Any) -> None:
-        self.close()
+    async def __aexit__(self, *args: Any) -> None:
+        await self.close()
 
     # -- internal helpers ---------------------------------------------------
 
-    def _get(self, path: str, params: Optional[dict[str, Any]] = None) -> Any:
-        resp = self._client.get(path, params=_clean_params(params))
+    async def _get(self, path: str, params: Optional[dict[str, Any]] = None) -> Any:
+        resp = await self._client.get(path, params=_clean_params(params))
         return _parse_response(resp)
 
-    def _post(self, path: str, json: Optional[Any] = None) -> Any:
-        resp = self._client.post(path, json=json)
+    async def _post(self, path: str, json: Optional[Any] = None) -> Any:
+        resp = await self._client.post(path, json=json)
         return _parse_response(resp)
 
-    def _patch(self, path: str, json: Optional[Any] = None) -> Any:
-        resp = self._client.patch(path, json=json)
+    async def _patch(self, path: str, json: Optional[Any] = None) -> Any:
+        resp = await self._client.patch(path, json=json)
         return _parse_response(resp)
 
-    def _put(self, path: str, json: Optional[Any] = None) -> Any:
-        resp = self._client.put(path, json=json)
+    async def _put(self, path: str, json: Optional[Any] = None) -> Any:
+        resp = await self._client.put(path, json=json)
         return _parse_response(resp)
 
-    def _delete(self, path: str) -> Any:
-        resp = self._client.delete(path)
+    async def _delete(self, path: str) -> Any:
+        resp = await self._client.delete(path)
         return _parse_response(resp)
 
     # ======================================================================
     # Gates
     # ======================================================================
 
-    def list_gates(self) -> list[dict[str, Any]]:
+    async def list_gates(self) -> list[dict[str, Any]]:
         """List all gates you own."""
-        return self._get("/api/gates")
+        return await self._get("/api/gates")
 
-    def get_gate(self, gate_id: str) -> dict[str, Any]:
+    async def get_gate(self, gate_id: str) -> dict[str, Any]:
         """Get details for a specific gate."""
-        return self._get(f"/api/gates/{gate_id}")
+        return await self._get(f"/api/gates/{gate_id}")
 
-    def create_gate(
+    async def create_gate(
         self,
         *,
         name: str,
@@ -129,30 +129,30 @@ class ModusClient:
             description=description,
             allow_self_issued=allow_self_issued,
         )
-        return self._post("/api/gates", json=body.model_dump(exclude_none=True))
+        return await self._post("/api/gates", json=body.model_dump(exclude_none=True))
 
-    def update_gate(self, gate_id: str, **kwargs: Any) -> dict[str, Any]:
+    async def update_gate(self, gate_id: str, **kwargs: Any) -> dict[str, Any]:
         """Update settings for an existing gate."""
         body = GateUpdate(**kwargs)
-        return self._patch(f"/api/gates/{gate_id}", json=body.model_dump(exclude_none=True))
+        return await self._patch(f"/api/gates/{gate_id}", json=body.model_dump(exclude_none=True))
 
-    def delete_gate(self, gate_id: str) -> dict[str, Any]:
+    async def delete_gate(self, gate_id: str) -> dict[str, Any]:
         """Delete (archive) a gate."""
-        return self._delete(f"/api/gates/{gate_id}")
+        return await self._delete(f"/api/gates/{gate_id}")
 
     # ======================================================================
     # Passports
     # ======================================================================
 
-    def list_passports(self, gate_id: str) -> list[dict[str, Any]]:
+    async def list_passports(self, gate_id: str) -> list[dict[str, Any]]:
         """List all active passports for a gate."""
-        return self._get(f"/api/gates/{gate_id}/passports")
+        return await self._get(f"/api/gates/{gate_id}/passports")
 
-    def get_passport(self, gate_id: str, passport_id: str) -> dict[str, Any]:
+    async def get_passport(self, gate_id: str, passport_id: str) -> dict[str, Any]:
         """Get details for a specific passport."""
-        return self._get(f"/api/gates/{gate_id}/passports/{passport_id}")
+        return await self._get(f"/api/gates/{gate_id}/passports/{passport_id}")
 
-    def issue_passport(
+    async def issue_passport(
         self,
         gate_id: str,
         *,
@@ -176,16 +176,16 @@ class ModusClient:
             expires_in=expires_in,
             metadata=metadata,
         )
-        return self._post(
+        return await self._post(
             f"/api/gates/{gate_id}/passports",
             json=body.model_dump(exclude_none=True),
         )
 
-    def revoke_passport(self, gate_id: str, passport_id: str) -> dict[str, Any]:
+    async def revoke_passport(self, gate_id: str, passport_id: str) -> dict[str, Any]:
         """Revoke a passport immediately."""
-        return self._delete(f"/api/gates/{gate_id}/passports/{passport_id}")
+        return await self._delete(f"/api/gates/{gate_id}/passports/{passport_id}")
 
-    def reissue_passport(
+    async def reissue_passport(
         self,
         passport_id: str,
         *,
@@ -195,13 +195,13 @@ class ModusClient:
         body: dict[str, Any] = {}
         if accept_catalog_version is not None:
             body["accept_catalog_version"] = accept_catalog_version
-        return self._post(f"/api/passports/{passport_id}/reissue", json=body)
+        return await self._post(f"/api/passports/{passport_id}/reissue", json=body)
 
     # ======================================================================
     # Attestations
     # ======================================================================
 
-    def list_attestations(
+    async def list_attestations(
         self,
         gate_id: str,
         *,
@@ -212,7 +212,7 @@ class ModusClient:
         limit: Optional[int] = None,
     ) -> list[dict[str, Any]]:
         """List attestations (audit log) for a gate."""
-        return self._get(
+        return await self._get(
             f"/api/gates/{gate_id}/attestations",
             params={
                 "passport_id": passport_id,
@@ -223,25 +223,25 @@ class ModusClient:
             },
         )
 
-    def record_attestation(
+    async def record_attestation(
         self, gate_id: str, **kwargs: Any
     ) -> dict[str, Any]:
         """Record a new attestation."""
-        return self._post(f"/api/gates/{gate_id}/attestations", json=kwargs)
+        return await self._post(f"/api/gates/{gate_id}/attestations", json=kwargs)
 
     # ======================================================================
     # Permission Catalog
     # ======================================================================
 
-    def get_catalog(self, gate_id: str) -> dict[str, Any]:
+    async def get_catalog(self, gate_id: str) -> dict[str, Any]:
         """Get the active draft catalog for a gate."""
-        return self._get(f"/api/gates/{gate_id}/catalog")
+        return await self._get(f"/api/gates/{gate_id}/catalog")
 
-    def create_catalog(self, gate_id: str, **kwargs: Any) -> dict[str, Any]:
+    async def create_catalog(self, gate_id: str, **kwargs: Any) -> dict[str, Any]:
         """Create or update the permission catalog for a gate."""
-        return self._post(f"/api/gates/{gate_id}/catalog", json=kwargs)
+        return await self._post(f"/api/gates/{gate_id}/catalog", json=kwargs)
 
-    def publish_catalog(
+    async def publish_catalog(
         self,
         gate_id: str,
         *,
@@ -254,25 +254,25 @@ class ModusClient:
             body["change_summary"] = change_summary
         if effective_at is not None:
             body["effective_at"] = effective_at
-        return self._post(f"/api/gates/{gate_id}/catalog/publish", json=body)
+        return await self._post(f"/api/gates/{gate_id}/catalog/publish", json=body)
 
-    def list_catalog_versions(self, gate_id: str) -> list[dict[str, Any]]:
+    async def list_catalog_versions(self, gate_id: str) -> list[dict[str, Any]]:
         """List all published catalog versions (metadata only)."""
-        return self._get(f"/api/gates/{gate_id}/catalog/versions")
+        return await self._get(f"/api/gates/{gate_id}/catalog/versions")
 
-    def get_catalog_version(self, gate_id: str, version: int) -> dict[str, Any]:
+    async def get_catalog_version(self, gate_id: str, version: int) -> dict[str, Any]:
         """Get a specific published catalog version."""
-        return self._get(f"/api/gates/{gate_id}/catalog/{version}")
+        return await self._get(f"/api/gates/{gate_id}/catalog/{version}")
 
-    def get_catalog_impact(self, gate_id: str) -> dict[str, Any]:
+    async def get_catalog_impact(self, gate_id: str) -> dict[str, Any]:
         """Get impact analysis for pending catalog changes."""
-        return self._get(f"/api/gates/{gate_id}/catalog/impact")
+        return await self._get(f"/api/gates/{gate_id}/catalog/impact")
 
     # ======================================================================
     # Gate Check (Authorization)
     # ======================================================================
 
-    def check_gate(
+    async def check_gate(
         self,
         gate_id: str,
         *,
@@ -286,52 +286,52 @@ class ModusClient:
             body["passport_id"] = passport_id
         if target is not None:
             body["target"] = target
-        return self._post(f"/api/gates/{gate_id}/check", json=body)
+        return await self._post(f"/api/gates/{gate_id}/check", json=body)
 
     # ======================================================================
     # Constraints
     # ======================================================================
 
-    def get_constraints(self, passport_id: str) -> dict[str, Any]:
+    async def get_constraints(self, passport_id: str) -> dict[str, Any]:
         """Get constraints for a passport."""
-        return self._get(f"/api/passports/{passport_id}/constraints")
+        return await self._get(f"/api/passports/{passport_id}/constraints")
 
-    def set_constraints(
+    async def set_constraints(
         self, passport_id: str, constraints: dict[str, Any]
     ) -> dict[str, Any]:
         """Set constraints on a passport."""
-        return self._put(f"/api/passports/{passport_id}/constraints", json=constraints)
+        return await self._put(f"/api/passports/{passport_id}/constraints", json=constraints)
 
-    def list_constraint_types(
+    async def list_constraint_types(
         self, *, category: Optional[str] = None
     ) -> list[dict[str, Any]]:
         """List available constraint type definitions."""
-        return self._get("/api/constraints/types", params={"category": category})
+        return await self._get("/api/constraints/types", params={"category": category})
 
-    def list_constraint_templates(
+    async def list_constraint_templates(
         self, *, category: Optional[str] = None
     ) -> list[dict[str, Any]]:
         """List system and user constraint templates."""
-        return self._get("/api/constraint-templates", params={"category": category})
+        return await self._get("/api/constraint-templates", params={"category": category})
 
-    def apply_constraint_template(
+    async def apply_constraint_template(
         self, passport_id: str, template_slug: str
     ) -> dict[str, Any]:
         """Apply a constraint template to a passport."""
-        return self._post(
+        return await self._post(
             f"/api/passports/{passport_id}/constraints",
             json={"template_slug": template_slug},
         )
 
-    def create_constraint_template(self, **kwargs: Any) -> dict[str, Any]:
+    async def create_constraint_template(self, **kwargs: Any) -> dict[str, Any]:
         """Create a user constraint template."""
-        return self._post("/api/constraint-templates", json=kwargs)
+        return await self._post("/api/constraint-templates", json=kwargs)
 
     # ======================================================================
     # Enforcement (CEL)
     # ======================================================================
 
-    def enforce_action(
+    async def enforce_action(
         self,
         *,
         passport_id: str,
@@ -348,9 +348,9 @@ class ModusClient:
             cost_cents=cost_cents,
             metadata=metadata,
         )
-        return self._post("/api/enforce", json=body.model_dump(exclude_none=True))
+        return await self._post("/api/enforce", json=body.model_dump(exclude_none=True))
 
-    def list_enforcement_attestations(
+    async def list_enforcement_attestations(
         self,
         passport_id: str,
         *,
@@ -358,46 +358,46 @@ class ModusClient:
         limit: Optional[int] = None,
     ) -> list[dict[str, Any]]:
         """List enforcement attestations for a passport."""
-        return self._get(
+        return await self._get(
             f"/api/passports/{passport_id}/enforcement",
             params={"decision": decision, "limit": limit},
         )
 
-    def get_enforcement_attestation(self, attestation_id: str) -> dict[str, Any]:
+    async def get_enforcement_attestation(self, attestation_id: str) -> dict[str, Any]:
         """Get a single enforcement attestation by ID."""
-        return self._get(f"/api/enforcement/{attestation_id}")
+        return await self._get(f"/api/enforcement/{attestation_id}")
 
-    def verify_enforcement_attestation(self, attestation_id: str) -> dict[str, Any]:
+    async def verify_enforcement_attestation(self, attestation_id: str) -> dict[str, Any]:
         """Verify the cryptographic signature of an enforcement attestation."""
-        return self._post(f"/api/enforcement/{attestation_id}/verify")
+        return await self._post(f"/api/enforcement/{attestation_id}/verify")
 
     # ======================================================================
     # Anonymous Access
     # ======================================================================
 
-    def get_anonymous_policy(self, gate_id: str) -> dict[str, Any]:
+    async def get_anonymous_policy(self, gate_id: str) -> dict[str, Any]:
         """Get the anonymous access policy for a gate."""
-        return self._get(f"/api/gates/{gate_id}/anonymous-policy")
+        return await self._get(f"/api/gates/{gate_id}/anonymous-policy")
 
-    def set_anonymous_policy(
+    async def set_anonymous_policy(
         self, gate_id: str, **kwargs: Any
     ) -> dict[str, Any]:
         """Configure anonymous access policy on a gate."""
-        return self._put(f"/api/gates/{gate_id}/anonymous-policy", json=kwargs)
+        return await self._put(f"/api/gates/{gate_id}/anonymous-policy", json=kwargs)
 
-    def get_anonymous_log(self, gate_id: str) -> list[dict[str, Any]]:
+    async def get_anonymous_log(self, gate_id: str) -> list[dict[str, Any]]:
         """Get the anonymous access audit log for a gate."""
-        return self._get(f"/api/gates/{gate_id}/anonymous-log")
+        return await self._get(f"/api/gates/{gate_id}/anonymous-log")
 
     # ======================================================================
     # Cumulative State
     # ======================================================================
 
-    def get_cumulative_state(self, passport_id: str) -> dict[str, Any]:
+    async def get_cumulative_state(self, passport_id: str) -> dict[str, Any]:
         """Get spending and rate limit state for a passport."""
-        return self._get(f"/api/passports/{passport_id}/state")
+        return await self._get(f"/api/passports/{passport_id}/state")
 
-    def reset_cumulative_state(
+    async def reset_cumulative_state(
         self,
         passport_id: str,
         *,
@@ -407,13 +407,13 @@ class ModusClient:
         body: dict[str, Any] = {}
         if window_type is not None:
             body["window_type"] = window_type
-        return self._post(f"/api/passports/{passport_id}/state/reset", json=body)
+        return await self._post(f"/api/passports/{passport_id}/state/reset", json=body)
 
     # ======================================================================
     # Commerce: Consumption Attestations
     # ======================================================================
 
-    def issue_consumption_attestation(
+    async def issue_consumption_attestation(
         self,
         *,
         passport_id: str,
@@ -442,13 +442,13 @@ class ModusClient:
             body["response_payload_hash"] = response_payload_hash
         if metadata is not None:
             body["metadata"] = metadata
-        return self._post("/api/consume", json=body)
+        return await self._post("/api/consume", json=body)
 
     # ======================================================================
     # Commerce: Discovery
     # ======================================================================
 
-    def discover_services(
+    async def discover_services(
         self,
         capability: str,
         *,
@@ -461,7 +461,7 @@ class ModusClient:
         offset: int = 0,
     ) -> dict[str, Any]:
         """Discover services by capability (public, no auth required)."""
-        return self._get(
+        return await self._get(
             "/api/discover",
             params={
                 "capability": capability,
@@ -479,7 +479,7 @@ class ModusClient:
     # Commerce: Settlement & Billing
     # ======================================================================
 
-    def generate_settlement(
+    async def generate_settlement(
         self,
         *,
         gate_id: str,
@@ -496,9 +496,9 @@ class ModusClient:
             period_end=period_end,
             agent_id=agent_id,
         )
-        return self._post("/api/billing", json=body.model_dump(exclude_none=True))
+        return await self._post("/api/billing", json=body.model_dump(exclude_none=True))
 
-    def list_settlements(
+    async def list_settlements(
         self,
         *,
         gate_id: Optional[str] = None,
@@ -511,7 +511,7 @@ class ModusClient:
         offset: int = 0,
     ) -> dict[str, Any]:
         """List settlement summaries."""
-        return self._get(
+        return await self._get(
             "/api/billing",
             params={
                 "gate_id": gate_id,
@@ -525,21 +525,21 @@ class ModusClient:
             },
         )
 
-    def get_settlement(self, settlement_id: str) -> dict[str, Any]:
+    async def get_settlement(self, settlement_id: str) -> dict[str, Any]:
         """Get a settlement by ID."""
-        return self._get(f"/api/billing/{settlement_id}")
+        return await self._get(f"/api/billing/{settlement_id}")
 
-    def update_settlement_status(
+    async def update_settlement_status(
         self, settlement_id: str, status: str
     ) -> dict[str, Any]:
         """Transition a settlement to a new status."""
-        return self._post(f"/api/billing/{settlement_id}/status", json={"status": status})
+        return await self._post(f"/api/billing/{settlement_id}/status", json={"status": status})
 
     # ======================================================================
     # Commerce: SLA Compliance
     # ======================================================================
 
-    def get_sla_compliance(
+    async def get_sla_compliance(
         self,
         gate_id: str,
         *,
@@ -548,7 +548,7 @@ class ModusClient:
         permission_key: Optional[str] = None,
     ) -> dict[str, Any]:
         """Get SLA compliance metrics for a gate."""
-        return self._get(
+        return await self._get(
             f"/api/gates/{gate_id}/sla",
             params={
                 "period_start": period_start,
@@ -561,7 +561,7 @@ class ModusClient:
     # Dry-Run Authorization
     # ======================================================================
 
-    def authorize_dry_run(
+    async def authorize_dry_run(
         self,
         *,
         gate_id: str,
@@ -577,17 +577,17 @@ class ModusClient:
         }
         if requested_constraints is not None:
             body["requested_constraints"] = requested_constraints
-        return self._post("/api/authorize/dry-run", json=body)
+        return await self._post("/api/authorize/dry-run", json=body)
 
     # ======================================================================
     # API Keys
     # ======================================================================
 
-    def list_api_keys(self) -> list[dict[str, Any]]:
+    async def list_api_keys(self) -> list[dict[str, Any]]:
         """List your API keys."""
-        return self._get("/api/users/api-keys")
+        return await self._get("/api/users/api-keys")
 
-    def create_api_key(
+    async def create_api_key(
         self,
         *,
         name: str,
@@ -597,8 +597,8 @@ class ModusClient:
         body: dict[str, Any] = {"name": name}
         if scopes is not None:
             body["scopes"] = scopes
-        return self._post("/api/users/api-keys", json=body)
+        return await self._post("/api/users/api-keys", json=body)
 
-    def revoke_api_key(self, key_id: str) -> dict[str, Any]:
+    async def revoke_api_key(self, key_id: str) -> dict[str, Any]:
         """Revoke an API key."""
-        return self._delete(f"/api/users/api-keys/{key_id}")
+        return await self._delete(f"/api/users/api-keys/{key_id}")

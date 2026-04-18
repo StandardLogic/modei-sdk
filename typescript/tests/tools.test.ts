@@ -9,7 +9,7 @@ import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { ApiClient } from '../src/api-client.js';
 import { handleToolCall } from '../src/tools/index.js';
 
-const BASE_URL = 'https://modustrust.ai';
+const BASE_URL = 'https://modeioperator.com';
 const API_KEY = 'mod_test_xxx';
 
 let api: ApiClient;

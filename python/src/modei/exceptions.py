@@ -1,12 +1,12 @@
-"""Typed exceptions for the Modus SDK."""
+"""Typed exceptions for the Modei SDK."""
 
 from __future__ import annotations
 
 from typing import Any, Optional
 
 
-class ModusError(Exception):
-    """Base exception for all Modus SDK errors."""
+class ModeiError(Exception):
+    """Base exception for all Modei SDK errors."""
 
     def __init__(
         self,
@@ -19,19 +19,19 @@ class ModusError(Exception):
         self.body = body
 
 
-class AuthenticationError(ModusError):
+class AuthenticationError(ModeiError):
     """Raised when the API key is invalid or missing (HTTP 401)."""
 
 
-class AuthorizationError(ModusError):
+class AuthorizationError(ModeiError):
     """Raised when the API key lacks required scopes (HTTP 403)."""
 
 
-class NotFoundError(ModusError):
+class NotFoundError(ModeiError):
     """Raised when the requested resource does not exist (HTTP 404)."""
 
 
-class RateLimitError(ModusError):
+class RateLimitError(ModeiError):
     """Raised when rate limits are exceeded (HTTP 429)."""
 
     def __init__(
@@ -44,9 +44,9 @@ class RateLimitError(ModusError):
         self.retry_after = retry_after
 
 
-class ValidationError(ModusError):
+class ValidationError(ModeiError):
     """Raised when request parameters fail validation (HTTP 400/422)."""
 
 
-class ConflictError(ModusError):
+class ConflictError(ModeiError):
     """Raised on resource conflicts like duplicate nonces (HTTP 409)."""

@@ -1,5 +1,5 @@
 /**
- * API Client for Modus Dashboard REST API
+ * API Client for Modei Dashboard REST API
  *
  * This is a thin wrapper that translates MCP tool calls into REST requests.
  */

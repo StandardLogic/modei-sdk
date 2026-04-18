@@ -3,23 +3,23 @@
 import pytest
 import respx
 
-from modus.client import ModusClient
-from modus.async_client import AsyncModusClient
+from modei.client import ModeiClient
+from modei.async_client import AsyncModeiClient
 
-BASE_URL = "https://modustrust.ai"
+BASE_URL = "https://modeioperator.com"
 API_KEY = "mod_test_xxx"
 
 
 @pytest.fixture
 def client():
-    c = ModusClient(api_key=API_KEY, base_url=BASE_URL)
+    c = ModeiClient(api_key=API_KEY, base_url=BASE_URL)
     yield c
     c.close()
 
 
 @pytest.fixture
 async def async_client():
-    c = AsyncModusClient(api_key=API_KEY, base_url=BASE_URL)
+    c = AsyncModeiClient(api_key=API_KEY, base_url=BASE_URL)
     yield c
     await c.close()
 

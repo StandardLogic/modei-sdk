@@ -3,17 +3,17 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "modus-sdk"
-version = "1.1.3"
-description = "Python SDK for the Modus REST API — manage agent passports, gates, and enforcement policies."
+name = "modei-sdk"
+version = "1.1.2"
+description = "Python SDK for the Modei REST API — manage agent passports, gates, and enforcement policies."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 authors = [
-    { name = "Standard Logic Co.", email = "support@modustrust.ai" },
+    { name = "Standard Logic Co.", email = "support@modeioperator.com" },
 ]
 keywords = [
-    "modus",
+    "modei",
     "ai-agents",
     "permissions",
     "passports",
@@ -40,6 +40,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+realtime = [
+    "supabase>=2.0.0",
+]
 dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
@@ -47,12 +50,12 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://modustrust.ai"
-Documentation = "https://modustrust.ai/guide"
-Repository = "https://github.com/StandardLogic/modus-mcp"
+Homepage = "https://modeioperator.com"
+Documentation = "https://modeioperator.com/guide"
+Repository = "https://github.com/StandardLogic/modei-mcp"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/modus"]
+packages = ["src/modei"]

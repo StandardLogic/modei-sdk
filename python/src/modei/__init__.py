@@ -1,7 +1,7 @@
-"""Modus Python SDK — trust infrastructure for AI agents."""
+"""Modei Python SDK — trust infrastructure for AI agents."""
 
-from .async_client import AsyncModusClient
-from .client import ModusClient
+from .async_client import AsyncModeiClient
+from .client import ModeiClient
 from .crypto import (
     compute_content_hash,
     verify_attestation_signature,
@@ -13,7 +13,7 @@ from .exceptions import (
     AuthorizationError,
     ConflictError,
     NotFoundError,
-    ModusError,
+    ModeiError,
     RateLimitError,
     ValidationError,
 )
@@ -54,10 +54,10 @@ from .types import (
 
 __all__ = [
     # Clients
-    "ModusClient",
-    "AsyncModusClient",
+    "ModeiClient",
+    "AsyncModeiClient",
     # Exceptions
-    "ModusError",
+    "ModeiError",
     "AuthenticationError",
     "AuthorizationError",
     "NotFoundError",

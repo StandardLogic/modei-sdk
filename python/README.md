@@ -1,18 +1,18 @@
-# modus-sdk
+# modei-sdk
 
-[![PyPI version](https://img.shields.io/pypi/v/modus-sdk)](https://pypi.org/project/modus-sdk/)
+[![PyPI version](https://img.shields.io/pypi/v/modei-sdk)](https://pypi.org/project/modei-sdk/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Python SDK for the [Modus](https://modustrust.ai) REST API. Manage agent passports, gates, and enforcement policies programmatically.
+Python SDK for the [Modei](https://modeioperator.com) REST API. Manage agent passports, gates, and enforcement policies programmatically.
 
-The MCP server (for Claude Desktop, Cursor, etc.) is the separate TypeScript package: [modus-mcp on npm](https://www.npmjs.com/package/modus-mcp).
+The MCP server (for Claude Desktop, Cursor, etc.) is the separate TypeScript package: [modei-mcp on npm](https://www.npmjs.com/package/modei-mcp).
 
 ---
 
 ## Installation
 
 ```bash
-pip install modus-sdk
+pip install modei-sdk
 ```
 
 ---
@@ -20,9 +20,9 @@ pip install modus-sdk
 ## Usage
 
 ```python
-from modus import ModusClient
+from modei import ModeiClient
 
-client = ModusClient(api_key="mod_live_xxx")
+client = ModeiClient(api_key="mod_live_xxx")
 
 # List all gates
 gates = client.list_gates()
@@ -59,10 +59,10 @@ client.close()
 
 ```python
 import asyncio
-from modus import AsyncModusClient
+from modei import AsyncModeiClient
 
 async def main():
-    async with AsyncModusClient(api_key="mod_live_xxx") as client:
+    async with AsyncModeiClient(api_key="mod_live_xxx") as client:
         gates = await client.list_gates()
         for gate in gates:
             passports = await client.list_passports(gate["gate_id"])
@@ -74,7 +74,7 @@ asyncio.run(main())
 Both clients support context managers for automatic cleanup:
 
 ```python
-with ModusClient(api_key="mod_live_xxx") as client:
+with ModeiClient(api_key="mod_live_xxx") as client:
     gates = client.list_gates()
 ```
 
@@ -189,7 +189,7 @@ client.revoke_api_key("key_xxx")
 Local verification utilities for Ed25519 signatures and RFC 8785 content hashing:
 
 ```python
-from modus import verify_attestation_signature, verify_content_hash, compute_content_hash
+from modei import verify_attestation_signature, verify_content_hash, compute_content_hash
 
 valid = verify_attestation_signature(
     attestation_json='{"gate_id":"gate_my-api",...}',
@@ -206,8 +206,8 @@ hash_hex = compute_content_hash({"key": "value"})
 ## Error Handling
 
 ```python
-from modus import (
-    ModusError,
+from modei import (
+    ModeiError,
     AuthenticationError,
     AuthorizationError,
     NotFoundError,
@@ -223,7 +223,7 @@ except NotFoundError as e:
     print(f"Status: {e.status_code}")  # 404
 except RateLimitError as e:
     print(f"Rate limited, retry after: {e.retry_after}s")
-except ModusError as e:
+except ModeiError as e:
     print(f"API error: {e} (HTTP {e.status_code})")
 ```
 
@@ -235,7 +235,7 @@ except ModusError as e:
 | `ConflictError` | 409 |
 | `ValidationError` | 400, 422 |
 | `RateLimitError` | 429 |
-| `ModusError` | All other errors |
+| `ModeiError` | All other errors |
 
 ---
 
@@ -243,20 +243,20 @@ except ModusError as e:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MODUS_API_KEY` | Yes | — | Your Modus API key |
-| `MODUS_API_URL` | No | `https://modustrust.ai` | API base URL (override for local dev) |
+| `MODEI_API_KEY` | Yes | — | Your Modei API key |
+| `MODEI_API_URL` | No | `https://modeioperator.com` | API base URL (override for local dev) |
 
 You can also pass these directly to the client:
 
 ```python
-client = ModusClient(api_key="mod_live_xxx", base_url="http://localhost:3000")
+client = ModeiClient(api_key="mod_live_xxx", base_url="http://localhost:3000")
 ```
 
 ---
 
 ## Documentation
 
-Full documentation at [modustrust.ai/docs](https://modustrust.ai/docs)
+Full documentation at [modeioperator.com/docs](https://modeioperator.com/docs)
 
 ---
 

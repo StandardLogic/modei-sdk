@@ -1,11 +1,11 @@
 {
-  "name": "modus-mcp",
+  "name": "modei-mcp",
   "version": "1.1.1",
-  "description": "Modus Management MCP Server - Manage issuers, passports, and gates from Claude",
+  "description": "Modei Management MCP Server - Manage issuers, passports, and gates from Claude",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "modus-mcp": "./dist/index.js"
+    "modei-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -16,7 +16,10 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@supabase/supabase-js": "^2.93.2",
+    "@noble/ed25519": "^3.0.0",
+    "@noble/hashes": "^2.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
@@ -30,7 +33,7 @@
   "keywords": [
     "mcp",
     "model-context-protocol",
-    "modus",
+    "modei",
     "ai-agents",
     "permissions",
     "passports",

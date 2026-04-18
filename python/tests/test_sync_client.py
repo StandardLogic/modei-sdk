@@ -1,4 +1,4 @@
-"""Comprehensive tests for the synchronous ModusClient."""
+"""Comprehensive tests for the synchronous ModeiClient."""
 
 import json
 
@@ -6,18 +6,18 @@ import httpx
 import pytest
 import respx
 
-from modus.client import ModusClient
-from modus.exceptions import (
+from modei.client import ModeiClient
+from modei.exceptions import (
     AuthenticationError,
     AuthorizationError,
     ConflictError,
     NotFoundError,
-    ModusError,
+    ModeiError,
     RateLimitError,
     ValidationError,
 )
 
-BASE_URL = "https://modustrust.ai"
+BASE_URL = "https://modeioperator.com"
 API_KEY = "mod_test_xxx"
 
 
@@ -975,7 +975,7 @@ class TestErrorHandling:
         mock_api.get("/api/gates").mock(
             return_value=httpx.Response(500, json={"message": "Internal server error"})
         )
-        with pytest.raises(ModusError) as exc_info:
+        with pytest.raises(ModeiError) as exc_info:
             client.list_gates()
         assert exc_info.value.status_code == 500
 
@@ -992,7 +992,7 @@ class TestErrorHandling:
         mock_api.get("/api/gates").mock(
             return_value=httpx.Response(502, text="Bad Gateway")
         )
-        with pytest.raises(ModusError) as exc_info:
+        with pytest.raises(ModeiError) as exc_info:
             client.list_gates()
         assert exc_info.value.status_code == 502
 
@@ -1014,6 +1014,6 @@ class TestContextManager:
         mock_api.get("/api/gates").mock(
             return_value=httpx.Response(200, json=[])
         )
-        with ModusClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        with ModeiClient(api_key=API_KEY, base_url=BASE_URL) as client:
             result = client.list_gates()
             assert result == []

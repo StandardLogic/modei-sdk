@@ -11,12 +11,12 @@ from .exceptions import (
     AuthorizationError,
     ConflictError,
     NotFoundError,
-    ModusError,
+    ModeiError,
     RateLimitError,
     ValidationError,
 )
 
-DEFAULT_BASE_URL = "https://modustrust.ai"
+DEFAULT_BASE_URL = "https://modeioperator.com"
 DEFAULT_TIMEOUT = 30.0
 
 
@@ -52,7 +52,7 @@ def _raise_for_status(response: httpx.Response) -> None:
     if response.status_code in (400, 422):
         raise ValidationError(message, **kwargs)
 
-    raise ModusError(message, **kwargs)
+    raise ModeiError(message, **kwargs)
 
 
 def _parse_response(response: httpx.Response) -> Any:

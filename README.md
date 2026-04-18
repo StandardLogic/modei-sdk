@@ -1,4 +1,4 @@
-# Modus
+# Modei
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![MCP Compatible](https://img.shields.io/badge/MCP-compatible-green)](https://modelcontextprotocol.io)
@@ -9,17 +9,17 @@ This repo contains two packages:
 
 | Package | Directory | Published as | Description |
 |---------|-----------|-------------|-------------|
-| **MCP Server** | [`typescript/`](typescript/) | [`modus-mcp`](https://www.npmjs.com/package/modus-mcp) on npm | MCP server for managing Modus infrastructure from Claude, Cursor, or any MCP client |
-| **Python SDK** | [`python/`](python/) | [`modus-sdk`](https://pypi.org/project/modus-sdk/) on PyPI | Python REST API client for managing gates, passports, and enforcement policies |
+| **MCP Server** | [`typescript/`](typescript/) | [`modei-mcp`](https://www.npmjs.com/package/modei-mcp) on npm | MCP server for managing Modei infrastructure from Claude, Cursor, or any MCP client |
+| **Python SDK** | [`python/`](python/) | [`modei-sdk`](https://pypi.org/project/modei-sdk/) on PyPI | Python REST API client for managing gates, passports, and enforcement policies |
 
 ---
 
 ## MCP Server (TypeScript)
 
-[![npm version](https://img.shields.io/npm/v/modus-mcp)](https://www.npmjs.com/package/modus-mcp)
+[![npm version](https://img.shields.io/npm/v/modei-mcp)](https://www.npmjs.com/package/modei-mcp)
 
 ```bash
-npx modus-mcp
+npx modei-mcp
 ```
 
 Add to your MCP client config:
@@ -27,11 +27,11 @@ Add to your MCP client config:
 ```json
 {
   "mcpServers": {
-    "modus": {
+    "modei": {
       "command": "npx",
-      "args": ["modus-mcp"],
+      "args": ["modei-mcp"],
       "env": {
-        "MODUS_API_KEY": "mod_live_xxxxxxxx"
+        "MODEI_API_KEY": "mod_live_xxxxxxxx"
       }
     }
   }
@@ -44,16 +44,16 @@ See [`typescript/README.md`](typescript/README.md) for full documentation.
 
 ## Python SDK
 
-[![PyPI version](https://img.shields.io/pypi/v/modus-sdk)](https://pypi.org/project/modus-sdk/)
+[![PyPI version](https://img.shields.io/pypi/v/modei-sdk)](https://pypi.org/project/modei-sdk/)
 
 ```bash
-pip install modus-sdk
+pip install modei-sdk
 ```
 
 ```python
-from modus import ModusClient
+from modei import ModeiClient
 
-client = ModusClient(api_key="mod_live_xxxxxxxx")
+client = ModeiClient(api_key="mod_live_xxxxxxxx")
 gates = client.list_gates()
 ```
 

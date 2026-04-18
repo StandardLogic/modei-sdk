@@ -1,4 +1,4 @@
-"""Comprehensive tests for the asynchronous AsyncModusClient."""
+"""Comprehensive tests for the asynchronous AsyncModeiClient."""
 
 import json
 
@@ -6,18 +6,18 @@ import httpx
 import pytest
 import respx
 
-from modus.async_client import AsyncModusClient
-from modus.exceptions import (
+from modei.async_client import AsyncModeiClient
+from modei.exceptions import (
     AuthenticationError,
     AuthorizationError,
     ConflictError,
     NotFoundError,
     RateLimitError,
-    ModusError,
+    ModeiError,
     ValidationError,
 )
 
-BASE_URL = "https://modustrust.ai"
+BASE_URL = "https://modeioperator.com"
 API_KEY = "mod_test_xxx"
 
 pytestmark = pytest.mark.asyncio
@@ -940,7 +940,7 @@ class TestErrorHandling:
         mock_api.get("/api/gates").mock(
             return_value=httpx.Response(500, json={"message": "Internal error"})
         )
-        with pytest.raises(ModusError) as exc_info:
+        with pytest.raises(ModeiError) as exc_info:
             await async_client.list_gates()
         assert exc_info.value.status_code == 500
 
@@ -957,7 +957,7 @@ class TestErrorHandling:
         mock_api.get("/api/gates").mock(
             return_value=httpx.Response(502, text="Bad Gateway")
         )
-        with pytest.raises(ModusError) as exc_info:
+        with pytest.raises(ModeiError) as exc_info:
             await async_client.list_gates()
         assert exc_info.value.status_code == 502
 
@@ -979,6 +979,6 @@ class TestContextManager:
         mock_api.get("/api/gates").mock(
             return_value=httpx.Response(200, json=[])
         )
-        async with AsyncModusClient(api_key=API_KEY, base_url=BASE_URL) as client:
+        async with AsyncModeiClient(api_key=API_KEY, base_url=BASE_URL) as client:
             result = await client.list_gates()
             assert result == []

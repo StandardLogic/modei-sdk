@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Modus Management MCP Server
+ * Modei Management MCP Server
  *
- * A thin adapter that exposes Modus Dashboard operations as MCP tools.
+ * A thin adapter that exposes Modei Dashboard operations as MCP tools.
  * Enables developers to manage issuers, passports, and gates directly from Claude.
  *
  * Usage:
- *   MODUS_API_KEY=sk_xxx npx modus-mcp
- *   MODUS_API_KEY=mod_xxx npx modus-mcp
+ *   MODEI_API_KEY=sk_xxx npx modei-mcp
+ *   MODEI_API_KEY=mod_xxx npx modei-mcp
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -20,34 +20,46 @@ import {
 
 import { ApiClient } from './api-client.js';
 import { allTools, handleToolCall } from './tools/index.js';
+import { createRealtimeAdapter, computeFingerprint, type RealtimeConfig, type AgentCredentials } from './realtime.js';
 
 // Configuration from environment
-const MODUS_API_URL = process.env.MODUS_API_URL || 'https://modustrust.ai';
-const MODUS_API_KEY = process.env.MODUS_API_KEY;
+const MODEI_API_URL = process.env.MODEI_API_URL || 'https://modeioperator.com';
+const MODEI_API_KEY = process.env.MODEI_API_KEY;
+
+// Realtime configuration (opt-in)
+const MODEI_REALTIME_ENABLED = process.env.MODEI_REALTIME_ENABLED === 'true';
+const MODEI_SUPABASE_URL = process.env.MODEI_SUPABASE_URL;
+const MODEI_REALTIME_TOKEN_ENDPOINT = process.env.MODEI_REALTIME_TOKEN_ENDPOINT || `${MODEI_API_URL}/api/auth/realtime-token`;
+
+// Agent/Passport credentials for Realtime + heartbeat
+const MODEI_AGENT_ID = process.env.MODEI_AGENT_ID;
+const MODEI_PASSPORT_ID = process.env.MODEI_PASSPORT_ID;
+const MODEI_PASSPORT_PRIVATE_KEY = process.env.MODEI_PASSPORT_PRIVATE_KEY; // Base64
+const MODEI_PASSPORT_PUBLIC_KEY = process.env.MODEI_PASSPORT_PUBLIC_KEY;   // Base64
 
 async function main() {
   // Validate configuration
-  if (!MODUS_API_KEY) {
-    console.error('Error: MODUS_API_KEY environment variable is required');
+  if (!MODEI_API_KEY) {
+    console.error('Error: MODEI_API_KEY environment variable is required');
     console.error('');
     console.error('Usage:');
-    console.error('  MODUS_API_KEY=sk_xxx npx modus-mcp');
+    console.error('  MODEI_API_KEY=sk_xxx npx modei-mcp');
     console.error('');
     console.error('Or for local development:');
-    console.error('  MODUS_API_KEY=mod_xxx npx modus-mcp');
+    console.error('  MODEI_API_KEY=mod_xxx npx modei-mcp');
     process.exit(1);
   }
 
   // Initialize API client
   const api = new ApiClient({
-    baseUrl: MODUS_API_URL,
-    apiKey: MODUS_API_KEY,
+    baseUrl: MODEI_API_URL,
+    apiKey: MODEI_API_KEY,
   });
 
   // Create MCP server
   const server = new Server(
     {
-      name: 'modus-manage',
+      name: 'modei-manage',
       version: '1.1.0',
     },
     {
@@ -97,9 +109,64 @@ async function main() {
   await server.connect(transport);
 
   // Log to stderr (stdout is reserved for MCP protocol)
-  console.error(`Modus Management MCP Server started`);
-  console.error(`  API URL: ${MODUS_API_URL}`);
-  console.error(`  API Key: ${MODUS_API_KEY.slice(0, 10)}...`);
+  console.error(`Modei Management MCP Server started`);
+  console.error(`  API URL: ${MODEI_API_URL}`);
+  console.error(`  API Key: ${MODEI_API_KEY.slice(0, 10)}...`);
+
+  // ── Startup heartbeat ──────────────────────────────────────────
+  if (MODEI_AGENT_ID && MODEI_PASSPORT_ID) {
+    try {
+      const heartbeatRes = await fetch(`${MODEI_API_URL}/api/agents/${MODEI_AGENT_ID}/heartbeat`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${MODEI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          passport_id: MODEI_PASSPORT_ID,
+          sdk: 'modei-mcp',
+          sdk_version: '1.2.0',
+          runtime: 'nodejs',
+          env: process.env.NODE_ENV || 'development',
+          started_at: new Date().toISOString(),
+        }),
+      });
+      if (heartbeatRes.ok) {
+        console.error(`  Heartbeat sent for agent ${MODEI_AGENT_ID}`);
+      } else {
+        console.error(`  Heartbeat failed: ${heartbeatRes.status}`);
+      }
+    } catch (err) {
+      console.error(`  Heartbeat error:`, err);
+    }
+  }
+
+  // ── Realtime connection (opt-in) ───────────────────────────────
+  if (MODEI_REALTIME_ENABLED && MODEI_SUPABASE_URL && MODEI_AGENT_ID && MODEI_PASSPORT_ID && MODEI_PASSPORT_PRIVATE_KEY && MODEI_PASSPORT_PUBLIC_KEY) {
+    try {
+      const realtimeConfig: RealtimeConfig = {
+        enabled: true,
+        supabaseUrl: MODEI_SUPABASE_URL,
+        tokenEndpoint: MODEI_REALTIME_TOKEN_ENDPOINT,
+      };
+
+      const credentials: AgentCredentials = {
+        agentId: MODEI_AGENT_ID,
+        passportId: MODEI_PASSPORT_ID,
+        passportFingerprint: computeFingerprint(MODEI_PASSPORT_PUBLIC_KEY),
+        privateKey: MODEI_PASSPORT_PRIVATE_KEY,
+        publicKey: MODEI_PASSPORT_PUBLIC_KEY,
+      };
+
+      const adapter = createRealtimeAdapter(realtimeConfig, credentials, MODEI_API_KEY);
+      await adapter.connect();
+      console.error(`  Realtime connected for agent ${MODEI_AGENT_ID}`);
+    } catch (err) {
+      console.error(`  Realtime connection failed (non-fatal):`, err);
+    }
+  } else if (MODEI_REALTIME_ENABLED) {
+    console.error(`  Realtime enabled but missing required env vars (MODEI_SUPABASE_URL, MODEI_AGENT_ID, MODEI_PASSPORT_ID, MODEI_PASSPORT_PRIVATE_KEY, MODEI_PASSPORT_PUBLIC_KEY)`);
+  }
 }
 
 main().catch((error) => {

@@ -1,4 +1,4 @@
-"""Pydantic v2 models for the Modus API."""
+"""Pydantic v2 models for the Modei API."""
 
 from __future__ import annotations
 
