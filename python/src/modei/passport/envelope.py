@@ -20,7 +20,7 @@ as ``invalid_envelope_shape``. Parity matters.
 
 from __future__ import annotations
 
-from typing import Any, Literal, Optional
+from typing import Any, Literal, NamedTuple, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -92,3 +92,25 @@ class Envelope(BaseModel):
 
 # Pydantic v2 forward-ref resolution for the recursive DelegationChainEntry.
 DelegationChainEntry.model_rebuild()
+
+
+class SignedPassport(NamedTuple):
+    """An envelope bundled with its detached Ed25519 signature.
+
+    Returned by :meth:`PassportIssuer.self_issue` and consumed by
+    :class:`DelegationBuilder`. Spec §11.1 names this wrapper ``Passport``;
+    the SDK uses ``SignedPassport`` because ``modei.Passport`` is already
+    exported as a REST-shape model by ``modei-python@1.0.0``.
+
+    As a ``NamedTuple``, instances unpack like a plain tuple:
+
+    .. code-block:: python
+
+        signed = issuer.self_issue(...)
+        envelope, signature = signed      # tuple unpack
+        signed.envelope                   # field access
+        signed.signature                  # field access
+    """
+
+    envelope: "Envelope"
+    signature: str

@@ -34,6 +34,7 @@ from .envelope import (
     PassportIdentity,
     PassportPermission,
     PassportProvenance,
+    SignedPassport,
 )
 
 # Backend parity: canonical byte-length cap per spec §2.1.
@@ -98,7 +99,7 @@ class PassportIssuer:
         expires_in: timedelta,
         delegation_authority: bool = False,
         verification_evidence: Optional[list[Any]] = None,
-    ) -> tuple[Envelope, str]:
+    ) -> SignedPassport:
         """Construct a v2 self-issued envelope and return it with its signature.
 
         Args:
@@ -111,9 +112,8 @@ class PassportIssuer:
             verification_evidence: L0.5 reserved field; default ``[]``.
 
         Returns:
-            ``(envelope, signature_b64)`` — envelope is the Pydantic
-            ``Envelope`` instance; signature is standard base64 of the
-            64-byte Ed25519 signature over the canonical envelope bytes.
+            :class:`SignedPassport` — a ``NamedTuple(envelope, signature)``.
+            Tuple-unpack is supported: ``env, sig = issuer.self_issue(...)``.
 
         Raises:
             ValueError: canonical envelope exceeds the 64KB per-envelope
@@ -158,7 +158,7 @@ class PassportIssuer:
         )
 
         signature_b64 = self._sign_envelope(envelope)
-        return envelope, signature_b64
+        return SignedPassport(envelope=envelope, signature=signature_b64)
 
     def _sign_envelope(self, envelope: Envelope) -> str:
         canonical_bytes = canonicalize_strict(envelope.model_dump(mode="json"))

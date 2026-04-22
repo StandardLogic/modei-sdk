@@ -26,6 +26,7 @@ import nacl.exceptions
 import nacl.signing
 from pydantic import ValidationError
 
+from ._subset import enforce_subset_permissions, is_expiry_non_extending
 from .canonical import canonicalize_strict
 from .envelope import DelegationChainEntry, Envelope
 from .reasons import PassportVerifyReasonCode
@@ -167,87 +168,6 @@ def _resolve_signer_local(envelope: Envelope) -> tuple[Optional[str], Optional[C
 
 
 # ---------------------------------------------------------------------------
-# subset + constraints + expiry (mirror of backend chain.ts 285–446)
-# ---------------------------------------------------------------------------
-
-
-def _deep_equal(a: Any, b: Any) -> bool:
-    return a == b  # Python dict / list equality is structural, matches backend deepEqual semantics.
-
-
-_NUMERIC_TIGHTEN = frozenset(
-    {
-        "max_per_action_cost",
-        "max_daily_cost",
-        "max_total_cost",
-        "rate_limit_per_minute",
-        "rate_limit_per_hour",
-    }
-)
-_SET_INCLUDE = frozenset({"allowed_domains", "allowed_paths", "allowed_models"})
-
-
-def _check_constraint_dimension(
-    dim: str, ancestor_val: Any, descendant_val: Any
-) -> Optional[str]:
-    """Return None if descendant tightens-or-equals ancestor; else detail message."""
-    if dim in _NUMERIC_TIGHTEN:
-        if not isinstance(ancestor_val, (int, float)) or isinstance(ancestor_val, bool):
-            return f"'{dim}' must be numeric on both sides"
-        if not isinstance(descendant_val, (int, float)) or isinstance(descendant_val, bool):
-            return f"'{dim}' must be numeric on both sides"
-        if descendant_val > ancestor_val:
-            return f"'{dim}' descendant={descendant_val} > ancestor={ancestor_val}"
-        return None
-
-    if dim in _SET_INCLUDE:
-        if not isinstance(ancestor_val, list) or not isinstance(descendant_val, list):
-            return f"'{dim}' must be an array on both sides"
-        anc_set = set(ancestor_val)
-        for v in descendant_val:
-            if v not in anc_set:
-                return f"'{dim}' descendant entry {v!r} not in ancestor"
-        return None
-
-    # operating_hours: deep-equality (backend chain.ts line 393 convention).
-    # Unknown dimensions also fall back to deep-equality.
-    if not _deep_equal(ancestor_val, descendant_val):
-        if dim == "operating_hours":
-            return "'operating_hours' descendant differs from ancestor (deep-equality required)"
-        return f"unknown constraint dimension '{dim}' must match ancestor exactly"
-    return None
-
-
-def _enforce_subset_permissions(
-    ancestor: Envelope, descendant: Envelope
-) -> Optional[str]:
-    """None on success; detail message on subset violation."""
-    ancestor_by_key = {p.permission_key: p for p in ancestor.permissions}
-    for desc_perm in descendant.permissions:
-        anc_perm = ancestor_by_key.get(desc_perm.permission_key)
-        if anc_perm is None:
-            return f"descendant permission {desc_perm.permission_key!r} not present in ancestor"
-        # Any dimension in descendant must also exist in ancestor and tighten.
-        for dim, desc_val in desc_perm.constraints.items():
-            if dim not in anc_perm.constraints:
-                return (
-                    f"permission '{desc_perm.permission_key}': constraint '{dim}' absent "
-                    "in ancestor; descendant cannot add it"
-                )
-            err = _check_constraint_dimension(dim, anc_perm.constraints[dim], desc_val)
-            if err is not None:
-                return f"permission '{desc_perm.permission_key}': {err}"
-    return None
-
-
-def _is_expiry_non_extending(ancestor: Envelope, descendant: Envelope) -> bool:
-    # Compare as strings first (ISO 8601 UTC Z lexicographic == chronological).
-    # Falls back to string compare which is sound for the Z-suffixed millisecond
-    # format the SDK emits. Backend parses via Date.parse; equivalent result.
-    return descendant.provenance.expires_at <= ancestor.provenance.expires_at
-
-
-# ---------------------------------------------------------------------------
 # public API
 # ---------------------------------------------------------------------------
 
@@ -375,15 +295,15 @@ class PassportVerifier:
 
         # Pairwise subset + expiry walk: chain[0] → chain[1] → ... → chain[last] → leaf.
         for i in range(len(chain) - 1):
-            subset_detail = _enforce_subset_permissions(
+            subset = enforce_subset_permissions(
                 chain[i].passport_json, chain[i + 1].passport_json
             )
-            if subset_detail is not None:
+            if not subset.ok:
                 return _err(
                     "permission_elevation_in_chain",
-                    f"chain[{i}]→chain[{i + 1}]: {subset_detail}",
+                    f"chain[{i}]→chain[{i + 1}]: {subset.detail}",
                 )
-            if not _is_expiry_non_extending(
+            if not is_expiry_non_extending(
                 chain[i].passport_json, chain[i + 1].passport_json
             ):
                 return _err(
@@ -391,13 +311,13 @@ class PassportVerifier:
                     f"chain[{i}]→chain[{i + 1}]",
                 )
         last_ancestor = chain[-1].passport_json
-        leaf_subset_detail = _enforce_subset_permissions(last_ancestor, leaf)
-        if leaf_subset_detail is not None:
+        leaf_subset = enforce_subset_permissions(last_ancestor, leaf)
+        if not leaf_subset.ok:
             return _err(
                 "permission_elevation_in_chain",
-                f"chain[{len(chain) - 1}]→leaf: {leaf_subset_detail}",
+                f"chain[{len(chain) - 1}]→leaf: {leaf_subset.detail}",
             )
-        if not _is_expiry_non_extending(last_ancestor, leaf):
+        if not is_expiry_non_extending(last_ancestor, leaf):
             return _err(
                 "expiry_extension_in_chain",
                 f"chain[{len(chain) - 1}]→leaf",
