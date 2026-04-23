@@ -52,3 +52,4 @@ export {
   PassportVerifier,
   type ChainVerifyResult,
 } from './passport/verifier.js';
+export { DelegationBuilder } from './passport/delegation.js';

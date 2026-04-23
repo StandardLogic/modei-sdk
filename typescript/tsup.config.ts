@@ -12,8 +12,9 @@ export default defineConfig({
     'src/passport/errors.ts',
     'src/passport/issuer.ts',
     'src/passport/verifier.ts',
+    'src/passport/delegation.ts',
     // _subset.ts is intentionally NOT listed — tsup bundles its code inline
-    // into issuer.js / verifier.js so consumers cannot import it directly.
+    // into verifier.js / delegation.js so consumers cannot import it directly.
   ],
   format: ['esm', 'cjs'],
   dts: true,

@@ -125,6 +125,16 @@
         "types": "./dist/passport/verifier.d.cts",
         "default": "./dist/passport/verifier.cjs"
       }
+    },
+    "./passport/delegation": {
+      "import": {
+        "types": "./dist/passport/delegation.d.ts",
+        "default": "./dist/passport/delegation.js"
+      },
+      "require": {
+        "types": "./dist/passport/delegation.d.cts",
+        "default": "./dist/passport/delegation.cjs"
+      }
     }
   },
   "files": [
