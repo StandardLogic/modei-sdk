@@ -55,6 +55,36 @@
         "types": "./dist/passport/reasons.d.cts",
         "default": "./dist/passport/reasons.cjs"
       }
+    },
+    "./passport/envelope": {
+      "import": {
+        "types": "./dist/passport/envelope.d.ts",
+        "default": "./dist/passport/envelope.js"
+      },
+      "require": {
+        "types": "./dist/passport/envelope.d.cts",
+        "default": "./dist/passport/envelope.cjs"
+      }
+    },
+    "./passport/agentId": {
+      "import": {
+        "types": "./dist/passport/agentId.d.ts",
+        "default": "./dist/passport/agentId.js"
+      },
+      "require": {
+        "types": "./dist/passport/agentId.d.cts",
+        "default": "./dist/passport/agentId.cjs"
+      }
+    },
+    "./passport/tier": {
+      "import": {
+        "types": "./dist/passport/tier.d.ts",
+        "default": "./dist/passport/tier.js"
+      },
+      "require": {
+        "types": "./dist/passport/tier.d.cts",
+        "default": "./dist/passport/tier.cjs"
+      }
     }
   },
   "files": [
