@@ -3,5 +3,8 @@ dist/
 coverage/
 .DS_Store
 
+# npm pack output from `pnpm smoke` / release rehearsals.
+*.tgz
+
 # Local reference material (frozen snapshot of backend specs; drifts after cutover).
 /.specs/

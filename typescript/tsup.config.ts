@@ -20,7 +20,11 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  splitting: false,
+  // splitting: true enables shared chunks between entries — so classes like
+  // ModeiError have a single identity across root + subpath imports.
+  // Without it, `err instanceof ModeiError` fails when ModeiError is imported
+  // from a different subpath than where the error was thrown.
+  splitting: true,
   target: 'es2022',
   outDir: 'dist',
 });
