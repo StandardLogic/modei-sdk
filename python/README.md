@@ -3,7 +3,9 @@
 [![PyPI version](https://img.shields.io/pypi/v/modei-python)](https://pypi.org/project/modei-python/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Python SDK for the [Modei](https://modei.ai) REST API. Manage agent passports, gates, and enforcement policies programmatically.
+Python identity and settlement library for [Modei](https://modei.ai): passport issuance, signing, verification, and consumption attestations, plus a thin REST client for the Modei API.
+
+This SDK does not enforce constraints locally. Enforcement decisions are made server-side by `POST /api/enforce`; `client.enforce_action()` is a thin wrapper over that endpoint, and the upcoming Modei proxy will add tool-call interception for MCP-based agents.
 
 The MCP server (for Claude Desktop, Cursor, etc.) is the separate TypeScript package: [modei-mcp on npm](https://www.npmjs.com/package/modei-mcp).
 
@@ -22,7 +24,7 @@ pip install modei-python
 ```python
 from modei import ModeiClient
 
-client = ModeiClient(api_key="mod_live_xxx")
+client = ModeiClient(api_key="mod_xxx")
 
 # List all gates
 gates = client.list_gates()
@@ -40,15 +42,15 @@ passport = client.issue_passport(
 
 # Check authorization
 result = client.check_gate("gate_my-api", action="read", passport_id=passport["passport_id"])
-print(result["allowed"])  # True
+print(result["decision"])  # "allow"
 
-# Enforce with constraints
+# Enforce with constraints (decision is "allow", "block", or "request_hold")
 enforcement = client.enforce_action(
     passport_id=passport["passport_id"],
     action="write",
     cost_cents=500,
 )
-print(enforcement["decision"])  # "PERMIT"
+print(enforcement["decision"])  # "allow"
 
 client.close()
 ```
@@ -62,7 +64,7 @@ import asyncio
 from modei import AsyncModeiClient
 
 async def main():
-    async with AsyncModeiClient(api_key="mod_live_xxx") as client:
+    async with AsyncModeiClient(api_key="mod_xxx") as client:
         gates = await client.list_gates()
         for gate in gates:
             passports = await client.list_passports(gate["gate_id"])
@@ -74,7 +76,7 @@ asyncio.run(main())
 Both clients support context managers for automatic cleanup:
 
 ```python
-with ModeiClient(api_key="mod_live_xxx") as client:
+with ModeiClient(api_key="mod_xxx") as client:
     gates = client.list_gates()
 ```
 
@@ -96,17 +98,17 @@ client.delete_gate("gate_my-api")
 
 ```python
 client.list_passports("gate_my-api")
-client.get_passport("gate_my-api", "pp_xxx")
+client.get_passport("gate_my-api", "pass_xxx")
 client.issue_passport("gate_my-api", agent_id="agent-001", permissions=["read"])
-client.revoke_passport("gate_my-api", "pp_xxx")
-client.reissue_passport("pp_xxx", accept_catalog_version=2)
+client.revoke_passport("gate_my-api", "pass_xxx")
+client.reissue_passport("pass_xxx", accept_catalog_version=2)
 ```
 
 ### Attestations
 
 ```python
 client.list_attestations("gate_my-api", limit=50)
-client.record_attestation("gate_my-api", passport_id="pp_xxx", permission="read", tool_name="search", result="allowed")
+client.record_attestation("gate_my-api", passport_id="pass_xxx", permission="read", tool_name="search", result="allowed")
 ```
 
 ### Permission Catalog
@@ -123,26 +125,26 @@ client.get_catalog_impact("gate_my-api")
 ### Gate Check
 
 ```python
-client.check_gate("gate_my-api", action="read", passport_id="pp_xxx")
+client.check_gate("gate_my-api", action="read", passport_id="pass_xxx")
 client.authorize_dry_run(gate_id="gate_my-api", passport={"..."}, requested_permission="read")
 ```
 
 ### Constraints
 
 ```python
-client.get_constraints("pp_xxx")
-client.set_constraints("pp_xxx", {"read": {"core:rate:max_per_minute": 100}})
+client.get_constraints("pass_xxx")
+client.set_constraints("pass_xxx", {"read": {"core:rate:max_per_minute": 100}})
 client.list_constraint_types(category="cost")
 client.list_constraint_templates(category="security")
-client.apply_constraint_template("pp_xxx", "conservative-agent")
+client.apply_constraint_template("pass_xxx", "conservative-agent")
 client.create_constraint_template(slug="my-template", name="My Template", constraints={...})
 ```
 
 ### Enforcement (CEL)
 
 ```python
-client.enforce_action(passport_id="pp_xxx", action="write", cost_cents=500)
-client.list_enforcement_attestations("pp_xxx", decision="BLOCK")
+client.enforce_action(passport_id="pass_xxx", action="write", cost_cents=500)
+client.list_enforcement_attestations("pass_xxx", decision="block")
 client.get_enforcement_attestation("enf_xxx")
 client.verify_enforcement_attestation("enf_xxx")
 ```
@@ -159,7 +161,7 @@ client.get_anonymous_log("gate_my-api")
 
 ```python
 client.discover_services("flights:search", max_price_cents=100, sort="price_asc")
-client.issue_consumption_attestation(passport_id="pp_xxx", gate_id="gate_my-api", action="flights:search", outcome="success")
+client.issue_consumption_attestation(passport_id="pass_xxx", gate_id="gate_my-api", action="flights:search", outcome="success")
 client.generate_settlement(gate_id="gate_my-api", period_type="monthly", period_start="2025-01-01", period_end="2025-01-31")
 client.list_settlements(gate_id="gate_my-api", status="pending")
 client.get_settlement("stl_xxx")
@@ -170,8 +172,8 @@ client.get_sla_compliance("gate_my-api", period_start="2025-01-01", period_end="
 ### Cumulative State
 
 ```python
-client.get_cumulative_state("pp_xxx")
-client.reset_cumulative_state("pp_xxx", window_type="daily")
+client.get_cumulative_state("pass_xxx")
+client.reset_cumulative_state("pass_xxx", window_type="daily")
 ```
 
 ### API Keys
@@ -249,7 +251,7 @@ except ModeiError as e:
 You can also pass these directly to the client:
 
 ```python
-client = ModeiClient(api_key="mod_live_xxx", base_url="http://localhost:3000")
+client = ModeiClient(api_key="mod_xxx", base_url="http://localhost:3000")
 ```
 
 ---

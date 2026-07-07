@@ -47,7 +47,7 @@ Add Modei to your MCP configuration:
       "command": "npx",
       "args": ["modei-mcp"],
       "env": {
-        "MODEI_API_KEY": "mod_live_xxxxxxxx"
+        "MODEI_API_KEY": "mod_xxxxxxxx"
       }
     }
   }
@@ -60,7 +60,7 @@ Add Modei to your MCP configuration:
 claude mcp add modei \
   --scope user \
   -- npx modei-mcp \
-  --env MODEI_API_KEY=mod_live_xxxxxxxx
+  --env MODEI_API_KEY=mod_xxxxxxxx
 ```
 
 Restart your client and you're ready to go.
@@ -175,7 +175,7 @@ Restart your client and you're ready to go.
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MODEI_API_KEY` | Yes | — | Your Modei API key (`mod_live_*` or `mod_test_*`) |
+| `MODEI_API_KEY` | Yes | — | Your Modei API key (`mod_` followed by hex) |
 | `MODEI_API_URL` | No | `https://modei.ai` | API base URL (override for local dev) |
 
 ---
@@ -192,7 +192,7 @@ For local testing against a development dashboard:
       "args": ["modei-mcp"],
       "env": {
         "MODEI_API_URL": "http://localhost:3000",
-        "MODEI_API_KEY": "mod_test_xxxxxxxx"
+        "MODEI_API_KEY": "mod_xxxxxxxx"
       }
     }
   }
@@ -207,7 +207,7 @@ For local testing against a development dashboard:
 Make sure you've restarted Claude Desktop after editing the config file. Check for JSON syntax errors in your config.
 
 **"Invalid API key" error**
-Verify your key starts with `mod_live_` (production) or `mod_test_` (development) and hasn't been revoked.
+Verify your key starts with `mod_` and hasn't been revoked.
 
 **Tools aren't showing up**
 Run `npx modei-mcp` directly in your terminal to check for startup errors. Ensure Node.js 18+.
@@ -216,11 +216,10 @@ Run `npx modei-mcp` directly in your terminal to check for startup errors. Ensur
 
 ## Learn More
 
-- [Modei Dashboard](https://modei.ai) — Create your account and manage gates, passports, and API keys
-- [Documentation & Guides](https://modei.ai)
-- [MCP SDK (TypeScript)](https://www.npmjs.com/package/modei-mcp-sdk) · [MCP SDK (Python)](https://pypi.org/project/modei-mcp-sdk/)
-- [Management SDK (Python)](https://pypi.org/project/modei-mcp/)
-- [Discussions](https://github.com/StandardLogic/modei-mcp/discussions) — Questions and ideas
+- [Modei Dashboard](https://modei.ai): Create your account and manage gates, passports, and API keys
+- [Documentation & Guides](https://modei.ai/docs)
+- [TypeScript SDK](https://www.npmjs.com/package/modei-typescript) · [Python SDK](https://pypi.org/project/modei-python/)
+- [Discussions](https://github.com/StandardLogic/modei-sdk/discussions): Questions and ideas
 
 ---
 

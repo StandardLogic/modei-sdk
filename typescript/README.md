@@ -1,7 +1,15 @@
 # modei-typescript
 
-TypeScript SDK for [Modei](https://modei.ai) — trust infrastructure for
-AI agents. Pronounced "Mo-dee".
+TypeScript identity library for [Modei](https://modei.ai), the trust
+infrastructure for AI agents: self-issued passports, Ed25519 signing,
+local verification, and attenuated delegation. Pronounced "Mo-dee".
+
+This package contains no REST client and no local constraint
+enforcement. Enforcement decisions are made server-side by
+`POST /api/enforce`: call it with `fetch()` (or the
+[`modei-python`](https://pypi.org/project/modei-python/) client), and
+the upcoming Modei proxy will add tool-call interception for MCP-based
+agents.
 
 > **Status:** `1.0.0-rc.1` — release candidate. Promotes to `1.0.0` at
 > prod cutover.
